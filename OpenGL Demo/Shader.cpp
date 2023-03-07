@@ -4,9 +4,9 @@
 #include <format>
 #include <memory>
 
-std::string getActionName(GLenum status);
-std::string readFile(const std::string& path);
-void compileShader(GLuint shader, GLenum shaderType);
+std::string GetActionName(GLenum status);
+std::string ReadFile(const std::string& path);
+void CompileShader(GLuint shader, GLenum shaderType);
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
 {
@@ -16,12 +16,15 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
         throw std::runtime_error("Failed to create shader program");
     }
     
-    attachShader(GL_VERTEX_SHADER, vertexPath);
-    attachShader(GL_FRAGMENT_SHADER, fragmentPath);
+    AttachShader(GL_VERTEX_SHADER, vertexPath);
+    AttachShader(GL_FRAGMENT_SHADER, fragmentPath);
     
     try
     {
-        link();
+        glLinkProgram(m_program);
+
+        VerifyProgramStatus(GL_LINK_STATUS);
+        VerifyProgramStatus(GL_VALIDATE_STATUS);
     }
     catch (std::exception&)
     {
@@ -35,24 +38,17 @@ Shader::~Shader()
     glDeleteProgram(m_program);
 }
 
-void Shader::bind() const
+void Shader::Bind() const
 {
     glUseProgram(m_program);
 }
 
-void Shader::unbind()
+void Shader::Unbind()
 {
     glUseProgram(0);
 }
 
-void Shader::link()
-{
-    glLinkProgram(m_program);
-
-    verifyProgramStatus(GL_LINK_STATUS);
-}
-
-void Shader::verifyProgramStatus(GLenum status) const
+void Shader::VerifyProgramStatus(GLenum status) const
 {
     GLint result;
     glGetProgramiv(m_program, status, &result);
@@ -63,15 +59,15 @@ void Shader::verifyProgramStatus(GLenum status) const
     std::unique_ptr<GLchar[]> errorLog = std::make_unique<GLchar[]>(result);
     glGetProgramInfoLog(m_program, result, NULL, errorLog.get());
 
-    std::string action = getActionName(status);
+    std::string action = GetActionName(status);
     std::string message = std::format("Failed to {} shader:\n\t{}", action, errorLog.get());
 
     throw std::runtime_error(message);
 }
 
-void Shader::attachShader(GLenum shaderType, const std::string& filepath)
+void Shader::AttachShader(GLenum shaderType, const std::string& filepath)
 {
-    std::string source = readFile(filepath);
+    std::string source = ReadFile(filepath);
     const GLchar* sources[] = { source.c_str() };
     const GLint sourceLengths[] = { source.size() };
 
@@ -80,7 +76,7 @@ void Shader::attachShader(GLenum shaderType, const std::string& filepath)
 
     try
     {
-        compileShader(shader, shaderType);
+        CompileShader(shader, shaderType);
     }
     catch (...)
     {
@@ -92,7 +88,7 @@ void Shader::attachShader(GLenum shaderType, const std::string& filepath)
     glDeleteShader(shader);
 }
 
-std::string readFile(const std::string& path)
+std::string ReadFile(const std::string& path)
 {
     std::ifstream file(path);
     std::stringstream buffer;
@@ -101,7 +97,7 @@ std::string readFile(const std::string& path)
     return buffer.str();
 }
 
-std::string getActionName(GLenum status)
+std::string GetActionName(GLenum status)
 {
     switch (status)
     {
@@ -114,7 +110,7 @@ std::string getActionName(GLenum status)
     }
 }
 
-void compileShader(GLuint shader, GLenum shaderType)
+void CompileShader(GLuint shader, GLenum shaderType)
 {
     glCompileShader(shader);
 

@@ -2,9 +2,9 @@
 #include <stdexcept>
 #include <glm/vec4.hpp>
 
-void initializeGlfw();
+void InitializeGlfw();
 
-void onResize(GLFWwindow* window, int width, int height)
+void OnResize(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
 }
@@ -35,7 +35,7 @@ Window::Window(int width, int height, std::string title)
     glfwGetFramebufferSize(m_window, &bufferWidth, &bufferHeight);
     glViewport(0, 0, bufferWidth, bufferHeight);
 
-    glfwSetWindowSizeCallback(m_window, onResize);
+    glfwSetWindowSizeCallback(m_window, OnResize);
 }
 
 Window::~Window()
@@ -44,23 +44,23 @@ Window::~Window()
     glfwTerminate();
 }
 
-const std::string& Window::getTitle() const
+const std::string& Window::GetTitle() const
 {
     return m_title;
 }
 
-void Window::setTitle(std::string title)
+void Window::SetTitle(std::string title)
 {
     glfwSetWindowTitle(m_window, title.c_str());
     m_title = title;
 }
 
-void Window::resize(int width, int height)
+void Window::Resize(int width, int height)
 {
     glfwSetWindowSize(m_window, width, height);
 }
 
-glm::ivec2 Window::getDimensions() const
+glm::ivec2 Window::GetDimensions() const
 {
     glm::ivec2 dimensions(0);
     glfwGetFramebufferSize(m_window, &dimensions.x, &dimensions.y);
@@ -68,17 +68,17 @@ glm::ivec2 Window::getDimensions() const
     return dimensions;
 }
 
-void Window::setBackgroundColor(glm::vec4 color)
+void Window::SetBackgroundColor(glm::vec4 color)
 {
     glClearColor(color.r, color.g, color.b, color.a);
 }
 
-bool Window::isClosed() const
+bool Window::IsClosed() const
 {
     return glfwWindowShouldClose(m_window);
 }
 
-void Window::update()
+void Window::Update()
 {
     glfwPollEvents();
 
@@ -86,7 +86,7 @@ void Window::update()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void initializeGlfw()
+void InitializeGlfw()
 {
     if (!glfwInit())
     {

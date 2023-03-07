@@ -1,7 +1,6 @@
 #include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
+#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -9,12 +8,15 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Mesh.h"
 #include "Window.h"
 #include "Shader.h"
 
 Window* window;
 Shader* shader;
-GLuint VAO, VBO;
+std::vector<Mesh> meshes;
+
 
 void printException(const std::exception& err, int level = 0)
 {
@@ -30,44 +32,41 @@ void printException(const std::exception& err, int level = 0)
     } catch (...) { }
 }
 
-void createTriangle()
+Mesh createTriangle()
 {
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    GLfloat vertices[] = {
+    constexpr GLfloat vertices[] = {
         -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f
+         0.0f, -1.0f, 1.0f,
+         1.0f, -1.0f, 0.0f,
+         0.0f,  1.0f, 0.0f
     };
 
-   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    constexpr unsigned int indices[] = {
+        0, 3, 1,
+        1, 3, 2,
+        2, 3, 0,
+        0, 1, 2
+    };
 
-   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-   glEnableVertexAttribArray(0);
-
-   glBindBuffer(GL_ARRAY_BUFFER, 0);
-   glBindVertexArray(0);
+    meshes.push_back(Mesh(vertices, 12, indices, 2));
 }
 
 void draw()
 {
-    shader->bind();
+    shader->Bind();
 
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glBindVertexArray(0);
+    for (Mesh& mesh : meshes)
+    {
+        mesh.Render();
+    }
 
-    shader->unbind();
+    shader->Unbind();
 }
 
 void initialize()
 {
     window = new Window(800, 600, "Hello World!");
-    window->setBackgroundColor(glm::vec4 { 0.35f, 0.75f, 0.66f, 1.0f });
+    window->SetBackgroundColor(glm::vec4 { 0.35f, 0.75f, 0.66f, 1.0f });
 
     shader = new Shader("vertex.glsl", "fragment.glsl");
 
