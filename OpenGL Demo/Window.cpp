@@ -1,8 +1,14 @@
-#include "Window.h"
+#include <format>
 #include <stdexcept>
+
+#include "Window.h"
+#include "Input.h"
+
 #include <glm/vec4.hpp>
 
 void InitializeGlfw();
+void OnKeyEvent(GLFWwindow* window, int key, int code, int action, int mode);
+void OnMouseMoveEvent(GLFWwindow* window, double x, double y);
 
 void OnResize(GLFWwindow* window, int width, int height)
 {
@@ -12,7 +18,7 @@ void OnResize(GLFWwindow* window, int width, int height)
 Window::Window(int width, int height, std::string title)
     : m_title(title)
 {
-    initializeGlfw();
+    InitializeGlfw();
 
     m_window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
     if (!m_window)
@@ -24,18 +30,31 @@ Window::Window(int width, int height, std::string title)
     glfwMakeContextCurrent(m_window);
 
     glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK)
+    
+    GLenum glewStatus = glewInit();
+    if (glewStatus != GLEW_OK)
     {
+        const char* error = (const char*) glewGetErrorString(glewStatus);
+        
         glfwDestroyWindow(m_window);
         glfwTerminate();
-        throw std::runtime_error("Failed to initialize GLEW");
+
+        throw std::runtime_error(std::format("Failed to initialize GLEW, {}", error));
     }
 
     int bufferWidth, bufferHeight;
     glfwGetFramebufferSize(m_window, &bufferWidth, &bufferHeight);
-    glViewport(0, 0, bufferWidth, bufferHeight);
 
     glfwSetWindowSizeCallback(m_window, OnResize);
+    glfwSetKeyCallback(m_window, OnKeyEvent);
+    glfwSetCursorPosCallback(m_window, OnMouseMoveEvent);
+
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    glEnable(GL_DEPTH_TEST);
+    glViewport(0, 0, bufferWidth, bufferHeight);
+
+    Input::InitializeInputHandler();
 }
 
 Window::~Window()
@@ -83,7 +102,7 @@ void Window::Update()
     glfwPollEvents();
 
     glfwSwapBuffers(m_window);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void InitializeGlfw()
@@ -99,4 +118,27 @@ void InitializeGlfw()
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+}
+
+void OnKeyEvent(GLFWwindow* window, int key, int code, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+
+    Input::OnKeyEvent().Post(Input::KeyEvent{ key, action });
+}
+
+void OnMouseMoveEvent(GLFWwindow* window, double x, double y)
+{
+    static float lastX = (float) x, lastY = (float) y;
+    
+    float dx = (float) x - lastX;
+    float dy = (float) y - lastY;
+
+    lastX = (float) x;
+    lastY = (float) y;
+
+    Input::OnMouseMoveEvent().Post(Input::MouseMoveEvent { dx, dy });
 }

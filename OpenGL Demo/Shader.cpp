@@ -2,22 +2,25 @@
 #include <sstream>
 #include <fstream>
 #include <format>
-#include <memory>
+
+#include <glm/gtc/type_ptr.hpp>
 
 std::string GetActionName(GLenum status);
 std::string ReadFile(const std::string& path);
 void CompileShader(GLuint shader, GLenum shaderType);
 
-Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
+Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
 {
     m_program = glCreateProgram();
     if (!m_program)
     {
-        throw std::runtime_error("Failed to create shader program");
+        const char* error = (const char*) glewGetErrorString(glGetError());
+
+        throw std::runtime_error(std::format("Failed to create shader program: {}", error));
     }
     
-    AttachShader(GL_VERTEX_SHADER, vertexPath);
-    AttachShader(GL_FRAGMENT_SHADER, fragmentPath);
+    AttachShader(GL_VERTEX_SHADER, vertexSource);
+    AttachShader(GL_FRAGMENT_SHADER, fragmentSource);
     
     try
     {
@@ -30,7 +33,7 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
     {
         glDeleteProgram(m_program);
         throw;
-    }
+    }    
 }
 
 Shader::~Shader()
@@ -65,9 +68,8 @@ void Shader::VerifyProgramStatus(GLenum status) const
     throw std::runtime_error(message);
 }
 
-void Shader::AttachShader(GLenum shaderType, const std::string& filepath)
+void Shader::AttachShader(GLenum shaderType, const std::string& source)
 {
-    std::string source = ReadFile(filepath);
     const GLchar* sources[] = { source.c_str() };
     const GLint sourceLengths[] = { source.size() };
 
@@ -81,18 +83,49 @@ void Shader::AttachShader(GLenum shaderType, const std::string& filepath)
     catch (...)
     {
         glDeleteShader(shader);
-        std::throw_with_nested(std::runtime_error(std::format("Failed to compile shader: '{}'", filepath)));
+        throw;
     }
     
     glAttachShader(m_program, shader);
     glDeleteShader(shader);
 }
 
+GLint Shader::GetUniformLocation(const std::string& name) {
+    auto it = m_uniformCache.find(name);
+    
+    // Cache miss
+    if (it == m_uniformCache.end())
+    {
+        GLint location = glGetUniformLocation(m_program, name.c_str());
+        if (location == -1)
+        {
+            throw std::runtime_error(std::format("Could not find uniform variable '{}'", name));
+        }
+
+        m_uniformCache.insert({ name, location });
+        return location;
+    }
+
+    return (*it).second;
+}
+
+std::unique_ptr<Shader> Shader::FromFiles(const std::string& vertexPath, const std::string& fragmentPath)
+{
+    std::string vertexSource = ReadFile(vertexPath);
+    std::string fragmentSource = ReadFile(fragmentPath);
+
+    return std::make_unique<Shader>(vertexSource, fragmentSource);
+}
+
 std::string ReadFile(const std::string& path)
 {
     std::ifstream file(path);
-    std::stringstream buffer;
+    if (!file.is_open())
+    {
+        throw std::runtime_error(std::format("Failed to open file: {}", path));
+    }
 
+    std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
 }
@@ -123,5 +156,30 @@ void CompileShader(GLuint shader, GLenum shaderType)
     std::unique_ptr<GLchar[]> errorLog = std::make_unique<GLchar[]>(result);
     glGetShaderInfoLog(shader, result, NULL, errorLog.get());
     
-    throw std::runtime_error(errorLog.get());
+    std::string message = std::format("Failed to compile shader: {}", errorLog.get());
+    throw std::runtime_error(message);
+}
+
+void Shader::SetUniform(const std::string& name, const glm::mat4& mat)
+{
+    GLint location = GetUniformLocation(name);
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+}
+
+void Shader::SetUniform(const std::string& name, const glm::vec3& vec)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform3fv(location, 1, glm::value_ptr(vec));
+}
+
+void Shader::SetUniform(const std::string& name, float scalar)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform1f(location, scalar);
+}
+
+void Shader::SetUniform(const std::string& name, int scalar)
+{
+    GLint location = GetUniformLocation(name);
+    glUniform1i(location, scalar);
 }
