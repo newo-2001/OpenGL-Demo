@@ -14,8 +14,14 @@ Mesh::Mesh(const GLfloat* const vertices, size_t vertexCount, const unsigned int
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertexCount, vertices, GL_STATIC_DRAW);
     
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glEnableVertexAttribArray(0);
+    int stride = sizeof(GLfloat) * 5;
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, (void*) (sizeof(GLfloat) * 3));
+
+    for (size_t i = 0; i < 2; i++)
+    {
+        glEnableVertexAttribArray(i);
+    }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -26,6 +32,11 @@ void Mesh::Render() const
 {
     glBindVertexArray(m_VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO);
+
+    if (m_texture)
+    {
+        m_texture->Use();
+    }
     
     glDrawElements(GL_TRIANGLES, m_indices, GL_UNSIGNED_INT, 0);
 

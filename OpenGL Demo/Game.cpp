@@ -43,19 +43,20 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
 {
     std::unique_ptr<Scene> scene = std::make_unique<Scene>(window);
     
-    std::shared_ptr<Shader> shader = Shader::FromFiles("vertex.glsl", "fragment.glsl");
+    std::shared_ptr<Shader> shader = Shader::FromFiles("Resources/Shaders/vertex.glsl", "Resources/Shaders/fragment.glsl");
     scene->UseShader(shader);
     
     constexpr GLfloat vertices[] = {
-        -1.0, -1.0, 1.0,
-         1.0, -1.0, 1.0,
-         1.0,  1.0, 1.0,
-        -1.0,  1.0, 1.0,
+    //    x     y    z       u    v
+        -1.0, -1.0, 1.0,    0.0f, 0.0f,
+         1.0, -1.0, 1.0,    1.0f, 0.0f,
+         1.0,  1.0, 1.0,    1.0f, 1.0f,
+        -1.0,  1.0, 1.0,    0.0f, 1.0f,
 
-        -1.0, -1.0, -1.0,
-         1.0, -1.0, -1.0,
-         1.0,  1.0, -1.0,
-        -1.0,  1.0, -1.0
+        -1.0, -1.0, -1.0,   0.0f, 0.0f,
+         1.0, -1.0, -1.0,   1.0f, 0.0f,
+         1.0,  1.0, -1.0,   1.0f, 1.0f,
+        -1.0,  1.0, -1.0,   0.0f, 1.0f
     };
 
     constexpr unsigned int indices[] = {
@@ -79,7 +80,11 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
 		6, 7, 3
 	};
     
-    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(vertices, 8 * 3, indices, sizeof(indices) / sizeof(unsigned int));
+    std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>(vertices, 8 * 5, indices, sizeof(indices) / sizeof(unsigned int));
+
+    std::shared_ptr<Texture> texture = std::make_shared<Texture>("Resources/images/brick.png");
+    mesh->ApplyTexture(texture);
+
     scene->AddMesh(mesh);
 
     return scene;
