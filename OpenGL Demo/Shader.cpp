@@ -71,7 +71,7 @@ void Shader::VerifyProgramStatus(GLenum status) const
 void Shader::AttachShader(GLenum shaderType, const std::string& source)
 {
     const GLchar* sources[] = { source.c_str() };
-    const GLint sourceLengths[] = { source.size() };
+    const GLint sourceLengths[] = { (GLint) source.size() };
 
     GLuint shader = glCreateShader(shaderType);
     glShaderSource(shader, 1, sources, sourceLengths);
@@ -160,26 +160,30 @@ void CompileShader(GLuint shader, GLenum shaderType)
     throw std::runtime_error(message);
 }
 
-void Shader::SetUniform(const std::string& name, const glm::mat4& mat)
+template<>
+void Shader::SetUniform<glm::mat4>(Uniform<glm::mat4> uniform)
 {
-    GLint location = GetUniformLocation(name);
-    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+    GLint location = GetUniformLocation(uniform.location);
+    glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(uniform.value));
 }
 
-void Shader::SetUniform(const std::string& name, const glm::vec3& vec)
+template<>
+void Shader::SetUniform<glm::vec3>(Uniform<glm::vec3> uniform)
 {
-    GLint location = GetUniformLocation(name);
-    glUniform3fv(location, 1, glm::value_ptr(vec));
+    GLint location = GetUniformLocation(uniform.location);
+    glUniform3fv(location, 1, glm::value_ptr(uniform.value));
 }
 
-void Shader::SetUniform(const std::string& name, float scalar)
+template<>
+void Shader::SetUniform<float>(Uniform<float> uniform)
 {
-    GLint location = GetUniformLocation(name);
-    glUniform1f(location, scalar);
+    GLint location = GetUniformLocation(uniform.location);
+    glUniform1f(location, uniform.value);
 }
 
-void Shader::SetUniform(const std::string& name, int scalar)
+template<>
+void Shader::SetUniform<int>(Uniform<int> uniform)
 {
-    GLint location = GetUniformLocation(name);
-    glUniform1i(location, scalar);
+    GLint location = GetUniformLocation(uniform.location);
+    glUniform1i(location, uniform.value);
 }

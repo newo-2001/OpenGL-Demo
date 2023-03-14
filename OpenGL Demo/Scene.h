@@ -1,26 +1,45 @@
 #pragma once
 
-#include <vector>
+#include <array>
 
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include "Shader.h"
 #include "Mesh.h"
 #include "Window.h"
+#include "LightSource.h"
+#include "Renderable.h"
+#include "PointLight.h"
+#include "DirectionalLight.h"
+#include "SpotLight.h"
 
 
 class Scene
 {
 public:
+    const static size_t MAX_POINT_LIGHTS = 3;
+    const static size_t MAX_SPOT_LIGHTS = 3;
+
     Scene(const Window& window);
 
     void Render() const;
 
-    void AddMesh(std::shared_ptr<Mesh>& mesh);
+    void AddObject(std::unique_ptr<Renderable>& object);
     void UseShader(std::shared_ptr<Shader>& shader);
+    void AddDirectionalLight(std::unique_ptr<DirectionalLight>& light);
+    void AddPointLight(std::unique_ptr<PointLight>& pointLight);
+    void AddSpotLight(std::unique_ptr<SpotLight>& spotLight);
+
+    std::array<std::unique_ptr<SpotLight>, MAX_SPOT_LIGHTS>& GetSpotLights() { return m_spotLights; }
 private:
     glm::mat4 m_projectionMatrix;
-
-    std::vector<std::shared_ptr<Mesh>> m_meshes;
     std::shared_ptr<Shader> m_shader;
+    std::unique_ptr<DirectionalLight> m_directionalLight;
+
+    std::vector<std::unique_ptr<Renderable>> m_objects;
+    std::array<std::unique_ptr<PointLight>, Scene::MAX_POINT_LIGHTS> m_pointLights;
+    std::array<std::unique_ptr<SpotLight>, Scene::MAX_SPOT_LIGHTS> m_spotLights;
+    
+    size_t m_pointLightCount = 0;
+    size_t m_spotLightCount = 0;
 };

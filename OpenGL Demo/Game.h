@@ -17,6 +17,8 @@ public:
     static Game& GetInstance();
     static void Run();
 
+    void Update();
+
     Window& GetWindow() { return m_window; }
     std::weak_ptr<Camera> GetCamera() { return std::weak_ptr<Camera>(m_camera); }
     std::weak_ptr<Scene> GetActiveScene() { return std::weak_ptr<Scene>(m_scene); }

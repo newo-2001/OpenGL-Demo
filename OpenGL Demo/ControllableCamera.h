@@ -15,8 +15,8 @@ public:
     void Update();
     void OnMouseMoved(Input::MouseMoveEvent event);
 private:
-    float m_movementSpeed = 0.05f;
-    float m_mouseSensitivity = 0.005f;
+    float m_movementSpeed = 0.2f;
+    float m_mouseSensitivity = 0.002f;
     
     long m_mouseMoveEventSubscription;
 };

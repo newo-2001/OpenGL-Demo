@@ -6,8 +6,12 @@
 
 #include "GL/glew.h"
 
-#include <glm/mat4x4.hpp>
-#include <glm/vec3.hpp>
+template<typename T>
+struct Uniform
+{
+    std::string location;
+    T value;
+};
 
 class Shader
 {
@@ -19,10 +23,8 @@ public:
     void Bind() const;
     static void Unbind();
 
-    void SetUniform(const std::string& name, const glm::mat4& mat);
-    void SetUniform(const std::string& name, const glm::vec3& vec);
-    void SetUniform(const std::string& name, float scalar);
-    void SetUniform(const std::string& name, int scalar);
+    template<typename T>
+    void SetUniform(Uniform<T> uniform);
 private:
     std::unordered_map<std::string, GLint> m_uniformCache = std::unordered_map<std::string, GLint>();
     GLuint m_program;

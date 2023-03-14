@@ -9,6 +9,7 @@
 void InitializeGlfw();
 void OnKeyEvent(GLFWwindow* window, int key, int code, int action, int mode);
 void OnMouseMoveEvent(GLFWwindow* window, double x, double y);
+void OnMouseButtonEvent(GLFWwindow* window, int button, int action, int mods);
 
 void OnResize(GLFWwindow* window, int width, int height)
 {
@@ -45,16 +46,20 @@ Window::Window(int width, int height, std::string title)
     int bufferWidth, bufferHeight;
     glfwGetFramebufferSize(m_window, &bufferWidth, &bufferHeight);
 
+    glfwSetWindowUserPointer(m_window, this);
+
     glfwSetWindowSizeCallback(m_window, OnResize);
     glfwSetKeyCallback(m_window, OnKeyEvent);
     glfwSetCursorPosCallback(m_window, OnMouseMoveEvent);
-
-    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetMouseButtonCallback(m_window, OnMouseButtonEvent);
 
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, bufferWidth, bufferHeight);
 
     Input::InitializeInputHandler();
+
+    GainFocus();
+    glfwSetInputMode(m_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
 
 Window::~Window()
@@ -105,6 +110,23 @@ void Window::Update()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Window::GainFocus()
+{
+    m_hasFocus = true;
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}
+
+void Window::LoseFocus()
+{
+    m_hasFocus = false;
+    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+    glm::vec2 center = GetDimensions() / 2;
+    glfwSetCursorPos(m_window, center.x, center.y);
+
+    Input::ReleaseAll();
+}
+
 void InitializeGlfw()
 {
     if (!glfwInit())
@@ -120,18 +142,43 @@ void InitializeGlfw()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 }
 
-void OnKeyEvent(GLFWwindow* window, int key, int code, int action, int mode)
+void OnKeyEvent(GLFWwindow* windowPtr, int key, int code, int action, int mode)
 {
+    Window* window = (Window*) glfwGetWindowUserPointer(windowPtr);
+
+    if (!window->HasFocus()) return;
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
+        glfwSetWindowShouldClose(windowPtr, GLFW_TRUE);
     }
 
-    Input::OnKeyEvent().Post(Input::KeyEvent{ key, action });
+    Input::OnKeyEvent.Post(Input::KeyEvent{ key, action });
 }
 
-void OnMouseMoveEvent(GLFWwindow* window, double x, double y)
+void OnMouseButtonEvent(GLFWwindow* windowPtr, int button, int action, int mods)
 {
+    Window* window = (Window*) glfwGetWindowUserPointer(windowPtr);
+    
+    if (!window->HasFocus() && button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS)
+    {
+        window->GainFocus();
+    }
+    else if (window->HasFocus() && button == GLFW_MOUSE_BUTTON_2 && action == GLFW_PRESS)
+    {
+        window->LoseFocus();
+        return;
+    }
+
+    if (!window->HasFocus()) return;
+
+    Input::OnMouseButtonEvent.Post(Input::MouseButtonEvent { button, action });
+}
+
+void OnMouseMoveEvent(GLFWwindow* windowPtr, double x, double y)
+{
+    Window* window = (Window*) glfwGetWindowUserPointer(windowPtr);
+
     static float lastX = (float) x, lastY = (float) y;
     
     float dx = (float) x - lastX;
@@ -139,6 +186,8 @@ void OnMouseMoveEvent(GLFWwindow* window, double x, double y)
 
     lastX = (float) x;
     lastY = (float) y;
+    
+    if (!window->HasFocus()) return;
 
-    Input::OnMouseMoveEvent().Post(Input::MouseMoveEvent { dx, dy });
+    Input::OnMouseMoveEvent.Post(Input::MouseMoveEvent { dx, dy });
 }

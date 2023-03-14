@@ -12,6 +12,10 @@ public:
     Window(int width, int height, std::string title);
     ~Window();
     
+    bool HasFocus() { return m_hasFocus; }
+    void GainFocus();
+    void LoseFocus();
+
     void SetTitle(std::string title);
     const std::string& GetTitle() const;
 
@@ -23,6 +27,7 @@ public:
     bool IsClosed() const;
     void Update();
 private:
+    bool m_hasFocus = true;
     std::string m_title;
     GLFWwindow* m_window;
 };

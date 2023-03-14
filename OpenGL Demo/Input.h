@@ -12,14 +12,23 @@ namespace Input
         int key, action;
     };
 
+    struct MouseButtonEvent
+    {
+        int button, action;
+    };
+
     struct MouseMoveEvent
     {
         float dx, dy;
     };
     
     bool IsKeyPressed(int key);
-    void InitializeInputHandler();
+    bool IsMouseButtonPressed(int button);
 
-    EventTopic<KeyEvent>& OnKeyEvent();
-    EventTopic<MouseMoveEvent>& OnMouseMoveEvent();
+    void InitializeInputHandler();
+    void ReleaseAll();
+
+    inline EventTopic<KeyEvent> OnKeyEvent;
+    inline EventTopic<MouseButtonEvent> OnMouseButtonEvent;
+    inline EventTopic<MouseMoveEvent> OnMouseMoveEvent;
 }
