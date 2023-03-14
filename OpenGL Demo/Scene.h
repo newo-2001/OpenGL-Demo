@@ -5,14 +5,13 @@
 #include <glm/ext/matrix_float4x4.hpp>
 
 #include "Shader.h"
-#include "Mesh.h"
 #include "Window.h"
 #include "LightSource.h"
 #include "Renderable.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "SpotLight.h"
-
+#include "GameObject.h"
 
 class Scene
 {
@@ -24,8 +23,10 @@ public:
 
     void Render() const;
 
-    void AddObject(std::unique_ptr<Renderable>& object);
+    void AddObject(std::shared_ptr<GameObject> object);
+
     void UseShader(std::shared_ptr<Shader>& shader);
+
     void AddDirectionalLight(std::unique_ptr<DirectionalLight>& light);
     void AddPointLight(std::unique_ptr<PointLight>& pointLight);
     void AddSpotLight(std::unique_ptr<SpotLight>& spotLight);
@@ -36,7 +37,8 @@ private:
     std::shared_ptr<Shader> m_shader;
     std::unique_ptr<DirectionalLight> m_directionalLight;
 
-    std::vector<std::unique_ptr<Renderable>> m_objects;
+    std::vector<std::shared_ptr<GameObject>> m_objects;
+
     std::array<std::unique_ptr<PointLight>, Scene::MAX_POINT_LIGHTS> m_pointLights;
     std::array<std::unique_ptr<SpotLight>, Scene::MAX_SPOT_LIGHTS> m_spotLights;
     

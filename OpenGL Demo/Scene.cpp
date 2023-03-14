@@ -6,6 +6,7 @@
 #include "Scene.h"
 #include "Game.h"
 #include <format>
+#include "Model.h"
 
 Scene::Scene(const Window& window)
 {
@@ -43,7 +44,7 @@ void Scene::Render() const
     m_shader->SetUniform(Uniform<glm::mat4> { "projection", m_projectionMatrix });
     m_shader->SetUniform(Uniform<glm::vec3> { "cameraPos", camera->GetPosition() });
     
-    for (const std::unique_ptr<Renderable>& object : m_objects)
+    for (const std::shared_ptr<GameObject>& object : m_objects)
     {
         object->Render(*m_shader);
     }
@@ -56,9 +57,9 @@ void Scene::UseShader(std::shared_ptr<Shader>& shader)
     m_shader = shader;
 }
 
-void Scene::AddObject(std::unique_ptr<Renderable>& object)
+void Scene::AddObject(std::shared_ptr<GameObject> object)
 {
-    m_objects.push_back(std::move(object));
+    m_objects.push_back(object);
 }
 
 void Scene::AddPointLight(std::unique_ptr<PointLight>& light)

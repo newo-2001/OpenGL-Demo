@@ -3,7 +3,7 @@
 
 #include "Texture.h"
 
-Texture::Texture(const std::string& filePath)
+Texture::Texture(const std::string& filePath, bool hasAlpha)
 {
     unsigned char* data = stbi_load(filePath.c_str(), &m_dimensions.x, &m_dimensions.y, &m_bitDepth, 0);
     if (!data)
@@ -18,8 +18,9 @@ Texture::Texture(const std::string& filePath)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_dimensions.x, m_dimensions.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    
+    GLenum colorSpace = hasAlpha ? GL_RGBA : GL_RGB;
+    glTexImage2D(GL_TEXTURE_2D, 0, colorSpace, m_dimensions.x, m_dimensions.y, 0, colorSpace, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glBindTexture(GL_TEXTURE_2D, 0);

@@ -6,6 +6,7 @@
 #include "Material.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "Model.h"
 
 std::unique_ptr<Scene> CreateScene(const Window& window);
 
@@ -24,11 +25,11 @@ Game& Game::GetInstance()
 
 void Game::Update()
 {
-    SpotLight& flashLight = *(m_scene->GetSpotLights()[1]);
+    /*SpotLight& flashLight = *(m_scene->GetSpotLights()[1]);
 
     const glm::vec3 offset = { 0.0f, -0.3f, 0.0f };
     flashLight.SetPosition(m_camera->GetPosition() - offset);
-    flashLight.SetDirection(m_camera->GetOrientation());
+    flashLight.SetDirection(m_camera->GetOrientation());*/
 }
 
 void Game::Run()
@@ -144,26 +145,26 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     std::shared_ptr<Shader> shader = Shader::FromFiles("Resources/Shaders/vertex.glsl", "Resources/Shaders/fragment.glsl");
     scene->UseShader(shader);
     
-    std::shared_ptr<Mesh> pyramid = CreatePyramid();
-    std::shared_ptr<Mesh> floor = CreateFloor();
+    std::shared_ptr<Renderable> pyramid = CreatePyramid();
+    std::shared_ptr<Renderable> floor = CreateFloor();
 
     std::shared_ptr<Material> shinyMaterial = std::make_shared<Material>(1.0f, 256.0f);
     std::shared_ptr<Material> dullMaterial = std::make_shared<Material>(0.3f, 4.0f);
 
-    std::shared_ptr<Texture> brickTexture = std::make_shared<Texture>("Resources/images/brick.png");
-    std::shared_ptr<Texture> dirtTexture = std::make_shared<Texture>("Resources/images/dirt.png");
-    std::shared_ptr<Texture> plainTexture = std::make_shared<Texture>("Resources/images/plain.png");
+    std::shared_ptr<Texture> brickTexture = std::make_shared<Texture>("Resources/images/brick.png", true);
+    std::shared_ptr<Texture> dirtTexture = std::make_shared<Texture>("Resources/images/dirt.png", true);
+    std::shared_ptr<Texture> plainTexture = std::make_shared<Texture>("Resources/images/plain.png", true);
 
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3 { 0.0f, 0.0f, -2.5f });
-    std::unique_ptr<Renderable> shinyBrickPyramid = std::make_unique<Renderable>(pyramid, brickTexture, shinyMaterial, model);
+    std::shared_ptr<GameObject> shinyBrickPyramid = std::make_shared<GameObject>(pyramid, model, brickTexture, shinyMaterial);
     scene->AddObject(shinyBrickPyramid);
 
     model = glm::translate(glm::mat4(1.0f), glm::vec3 { 0.0f, 4.0f, -2.5f });
-    std::unique_ptr<Renderable> dullDirtPyramid = std::make_unique<Renderable>(pyramid, dirtTexture, dullMaterial, model);
+    std::shared_ptr<GameObject> dullDirtPyramid = std::make_shared<GameObject>(pyramid, model, dirtTexture, dullMaterial);
     scene->AddObject(dullDirtPyramid);
     
     model = glm::translate(glm::mat4(1.0f), glm::vec3 { 0.0f, -2.0f, 0.0f });
-    std::unique_ptr<Renderable> floorObject = std::make_unique<Renderable>(floor, dirtTexture, shinyMaterial, model);
+    std::shared_ptr<GameObject> floorObject = std::make_shared<GameObject>(floor, model, dirtTexture, shinyMaterial);
     scene->AddObject(floorObject);
     
     glm::vec3 white = { 1.0f, 1.0f, 1.0f };
@@ -172,7 +173,7 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     glm::vec3 blue  = { 0.0f, 0.0f, 1.0f };
 
     glm::vec3 lightDirection = { 0.0f, 0.0f, -1.0f };
-    std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(lightDirection, white, 0.1f, 0.1f);
+    std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(lightDirection, white, 0.3f, 0.6f);
     
     std::unique_ptr<PointLight> greenLight = std::make_unique<PointLight>(
         glm::vec3 { 0.0f, 0.0f, 0.0f },
@@ -205,6 +206,19 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     scene->AddPointLight(blueLight);
     scene->AddSpotLight(down);
     scene->AddSpotLight(flashLight);
+    
+    model = glm::translate(glm::mat4(1.0f), glm::vec3 { -7.0f, 0.0f, 10.0f });
+    model = glm::scale(model, glm::vec3(0.006f));
+    std::shared_ptr<Renderable> xwingModel = std::make_shared<Model>("Resources/Models/x-wing.obj");
+    std::shared_ptr<GameObject> xwing = std::make_shared<GameObject>(xwingModel, model);
+    scene->AddObject(xwing);
+
+    model = glm::translate(glm::mat4(1.0f), glm::vec3 { -3.0f, 2.0f, 0.0f });
+    model = glm::rotate(model, (float) -std::numbers::pi / 2, glm::vec3 { 1.0f, 0.0f, 0.0f });
+    model = glm::scale(model, glm::vec3(0.4f));
+    std::shared_ptr<Renderable> heliModel = std::make_shared<Model>("Resources/Models/uh60.obj");
+    std::shared_ptr<GameObject> heli = std::make_shared<GameObject>(heliModel, model);
+    scene->AddObject(heli);
 
     return scene;
 }

@@ -9,7 +9,7 @@
 class Texture
 {
 public:
-    Texture(const std::string& filePath);
+    Texture(const std::string& filePath, bool hasAlpha = false);
     ~Texture();
 
     glm::ivec2 GetDimensions() { return m_dimensions; }

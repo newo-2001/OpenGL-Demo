@@ -1,12 +1,10 @@
 #pragma once
 
-#include <memory>
-
 #include <GL/glew.h>
 
-#include "Texture.h"
+#include "Renderable.h"
 
-class Mesh
+class Mesh : public Renderable
 {
 public:
     Mesh(const GLfloat* const vertices, size_t vertexCount, const unsigned int* const indices, GLsizei indexCount);

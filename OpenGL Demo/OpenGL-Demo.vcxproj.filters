@@ -31,6 +31,9 @@
     <Filter Include="Source Files\Rendering\Lighting">
       <UniqueIdentifier>{18ab4ea8-0f26-4288-ae49-7a27ecfffac9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Models">
+      <UniqueIdentifier>{eda5f5fc-7620-4ead-818c-6aeee866fa36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -51,7 +54,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="Renderable.cpp">
+    <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
@@ -84,6 +87,9 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files\Rendering\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -110,7 +116,7 @@
     <ClInclude Include="Scene.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Renderable.h">
+    <ClInclude Include="GameObject.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
@@ -137,6 +143,12 @@
     <ClInclude Include="Material.h">
       <Filter>Header Files\Rendering\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderable.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\fragment.glsl">
@@ -144,6 +156,12 @@
     </None>
     <None Include="Resources\Shaders\vertex.glsl">
       <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Models\uh60.mtl">
+      <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="Resources\Models\x-wing.mtl">
+      <Filter>Resource Files\Models</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -156,5 +174,13 @@
     <Image Include="Resources\Images\plain.png">
       <Filter>Resource Files\Images</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Resources\Models\uh60.obj">
+      <Filter>Resource Files\Models</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Resources\Models\x-wing.obj">
+      <Filter>Resource Files\Models</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>
