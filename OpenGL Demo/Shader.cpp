@@ -9,7 +9,7 @@ std::string GetActionName(GLenum status);
 std::string ReadFile(const std::string& path);
 void CompileShader(GLuint shader, GLenum shaderType);
 
-Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
+Shader::Shader(const std::string& vertexSource, std::optional<const std::string> fragmentSource)
 {
     m_program = glCreateProgram();
     if (!m_program)
@@ -20,7 +20,11 @@ Shader::Shader(const std::string& vertexSource, const std::string& fragmentSourc
     }
     
     AttachShader(GL_VERTEX_SHADER, vertexSource);
-    AttachShader(GL_FRAGMENT_SHADER, fragmentSource);
+
+    if (fragmentSource.has_value())
+    {
+        AttachShader(GL_FRAGMENT_SHADER, fragmentSource.value());
+    }
     
     try
     {
@@ -29,11 +33,11 @@ Shader::Shader(const std::string& vertexSource, const std::string& fragmentSourc
         VerifyProgramStatus(GL_LINK_STATUS);
         VerifyProgramStatus(GL_VALIDATE_STATUS);
     }
-    catch (std::exception&)
+    catch (...)
     {
         glDeleteProgram(m_program);
         throw;
-    }    
+    }
 }
 
 Shader::~Shader()
@@ -97,10 +101,10 @@ GLint Shader::GetUniformLocation(const std::string& name) {
     if (it == m_uniformCache.end())
     {
         GLint location = glGetUniformLocation(m_program, name.c_str());
-        if (location == -1)
+        /*if (location == -1)
         {
             throw std::runtime_error(std::format("Could not find uniform variable '{}'", name));
-        }
+        }*/
 
         m_uniformCache.insert({ name, location });
         return location;
@@ -109,12 +113,19 @@ GLint Shader::GetUniformLocation(const std::string& name) {
     return (*it).second;
 }
 
+std::unique_ptr<Shader> Shader::FromFile(const std::string& vertexPath)
+{
+    std::string vertexSource = ReadFile(vertexPath);
+
+    return std::make_unique<Shader>(vertexSource, std::nullopt);
+}
+
 std::unique_ptr<Shader> Shader::FromFiles(const std::string& vertexPath, const std::string& fragmentPath)
 {
     std::string vertexSource = ReadFile(vertexPath);
     std::string fragmentSource = ReadFile(fragmentPath);
 
-    return std::make_unique<Shader>(vertexSource, fragmentSource);
+    return std::make_unique<Shader>(vertexSource, std::make_optional(fragmentSource));
 }
 
 std::string ReadFile(const std::string& path)

@@ -90,6 +90,9 @@
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>Source Files\Rendering\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -149,6 +152,9 @@
     <ClInclude Include="Renderable.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowMap.h">
+      <Filter>Header Files\Rendering\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\fragment.glsl">
@@ -162,6 +168,9 @@
     </None>
     <None Include="Resources\Models\x-wing.mtl">
       <Filter>Resource Files\Models</Filter>
+    </None>
+    <None Include="Resources\Shaders\directional_shadow_map.vertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

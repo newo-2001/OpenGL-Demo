@@ -1,8 +1,9 @@
 #include "PointLight.h"
 
 PointLight::PointLight(glm::vec3 position, glm::vec3 attenuation,
-                       glm::vec3 color, float ambientIntensity, float diffuseIntensity) :
-    LightSource(color, ambientIntensity, diffuseIntensity),
+                       glm::vec3 color, float ambientIntensity, float diffuseIntensity,
+                       glm::ivec2 shadowDimensions) :
+    LightSource(color, ambientIntensity, diffuseIntensity, shadowDimensions),
     
     m_position(position),
     m_attenuation(attenuation)

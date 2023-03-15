@@ -92,6 +92,19 @@ glm::ivec2 Window::GetDimensions() const
     return dimensions;
 }
 
+glm::ivec2 Window::GetViewPort() const
+{
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, &viewport[0]);
+    
+    return glm::ivec2 { viewport[0], viewport[1] };
+}
+
+void Window::SetViewPort(int width, int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 void Window::SetBackgroundColor(glm::vec4 color)
 {
     glClearColor(color.r, color.g, color.b, color.a);

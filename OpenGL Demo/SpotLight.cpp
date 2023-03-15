@@ -5,8 +5,9 @@
 
 SpotLight::SpotLight(glm::vec3 direction, float edge, glm::vec3 position,
                      glm::vec3 attenuation, glm::vec3 color,
-                     float ambientIntensity, float diffuseIntensity) :
-    PointLight(position, attenuation, color, ambientIntensity, diffuseIntensity),
+                     float ambientIntensity, float diffuseIntensity,
+                     glm::ivec2 shadowDimensions) :
+    PointLight(position, attenuation, color, ambientIntensity, diffuseIntensity, shadowDimensions),
     m_direction(glm::normalize(direction)),
     m_edge(cosf(glm::radians(edge)))
 { }

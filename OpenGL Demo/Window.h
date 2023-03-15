@@ -20,7 +20,10 @@ public:
     const std::string& GetTitle() const;
 
     void Resize(int width, int height);
+    void SetViewPort(int width, int height);
+    
     glm::ivec2 GetDimensions() const;
+    glm::ivec2 GetViewPort() const;
 
     void SetBackgroundColor(glm::vec4 color);
 

@@ -35,6 +35,8 @@ public:
 private:
     glm::mat4 m_projectionMatrix;
     std::shared_ptr<Shader> m_shader;
+
+    std::unique_ptr<Shader> m_directionalShadowShader;
     std::unique_ptr<DirectionalLight> m_directionalLight;
 
     std::vector<std::shared_ptr<GameObject>> m_objects;
@@ -44,4 +46,8 @@ private:
     
     size_t m_pointLightCount = 0;
     size_t m_spotLightCount = 0;
+    
+    void RenderScene(Shader& shader) const;
+    void RenderPass() const;
+    void DirectionalShadowMapPass(const DirectionalLight& light) const;
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <memory>
@@ -16,8 +17,9 @@ struct Uniform
 class Shader
 {
 public:
+    static std::unique_ptr<Shader> FromFile(const std::string& vertexPath);
     static std::unique_ptr<Shader> FromFiles(const std::string& vertexPath, const std::string& fragmentPath);
-    Shader(const std::string& vertexSource, const std::string& fragmentSource);
+    Shader(const std::string& vertexSource, std::optional<const std::string> fragmentPath);
     ~Shader();
 
     void Bind() const;

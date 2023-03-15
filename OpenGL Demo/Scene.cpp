@@ -9,6 +9,7 @@
 #include "Model.h"
 
 Scene::Scene(const Window& window)
+    : m_directionalShadowShader(std::move(Shader::FromFile("Resources/Shaders/directional_shadow_map.vertex.glsl")))
 {
     glm::ivec2 dimensions = window.GetDimensions();
     GLfloat aspectRatio = (GLfloat) dimensions.x / dimensions.y;
@@ -19,11 +20,41 @@ Scene::Scene(const Window& window)
 void Scene::Render() const
 {
     if (!m_shader) return;
+    
+    DirectionalShadowMapPass(*m_directionalLight);
+    RenderPass();
+}
 
-    std::shared_ptr<Camera> camera = Game::GetInstance().GetCamera().lock();
+void Scene::DirectionalShadowMapPass(const DirectionalLight& light) const
+{
+    m_directionalShadowShader->Bind();
+        
+    ShadowMap& shadowMap = *light.GetShadowMap();
+    Window& window = Game::GetInstance().GetWindow();
+    
+    glm::ivec2 windowSize = window.GetDimensions();
 
+    glm::ivec2 dimensions = shadowMap.GetDimensions();
+    window.SetViewPort(dimensions.x, dimensions.y);
+
+    shadowMap.Write();
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    glm::mat4 transform = light.CalculateLightTransform();
+    m_directionalShadowShader->SetUniform(Uniform<glm::mat4> { "directionalLightTransform", transform });
+
+    RenderScene(*m_directionalShadowShader);
+
+    window.SetViewPort(windowSize.x, windowSize.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    m_directionalShadowShader->Unbind();
+}
+
+void Scene::RenderPass() const
+{
     m_shader->Bind();
     
+    std::shared_ptr<Camera> camera = Game::GetInstance().GetCamera().lock();
     m_directionalLight->Use("directionalLight", *m_shader);
     
     m_shader->SetUniform(Uniform<int> { "pointLightCount", (int) m_pointLightCount });
@@ -40,16 +71,29 @@ void Scene::Render() const
         light.Use(std::format("spotLights[{}]", i), *m_shader);
     }
 
+    glm::mat4 lightTransform = m_directionalLight->CalculateLightTransform();
+
+    m_shader->SetUniform(Uniform<glm::mat4> { "directionalLightTransform", lightTransform });
     m_shader->SetUniform(Uniform<glm::mat4> { "view", camera->GetViewMatrix() });
     m_shader->SetUniform(Uniform<glm::mat4> { "projection", m_projectionMatrix });
     m_shader->SetUniform(Uniform<glm::vec3> { "cameraPos", camera->GetPosition() });
-    
-    for (const std::shared_ptr<GameObject>& object : m_objects)
-    {
-        object->Render(*m_shader);
-    }
+
+    m_shader->SetUniform(Uniform<int> { "tex", 0 });
+
+    m_directionalLight->GetShadowMap()->Read(GL_TEXTURE1);
+    m_shader->SetUniform(Uniform<int> { "directionalShadowMap", 1 });
+
+    RenderScene(*m_shader);
 
     m_shader->Unbind();
+}
+
+void Scene::RenderScene(Shader& shader) const
+{
+    for (const std::shared_ptr<GameObject>& object : m_objects)
+    {
+        object->Render(shader);
+    }
 }
 
 void Scene::UseShader(std::shared_ptr<Shader>& shader)

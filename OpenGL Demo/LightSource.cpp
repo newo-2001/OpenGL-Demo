@@ -1,9 +1,10 @@
 #include "LightSource.h"
 
-LightSource::LightSource(glm::vec3 color, float ambientIntensity, float diffuseIntensity) :
+LightSource::LightSource(glm::vec3 color, float ambientIntensity, float diffuseIntensity, glm::ivec2 shadowDimensions) :
     m_ambientIntensity(ambientIntensity),
     m_diffuseIntensity(diffuseIntensity),
-    m_color(color)
+    m_color(color),
+    m_shadowMap(std::make_unique<ShadowMap>(shadowDimensions))
 { }
 
 void LightSource::Use(const std::string& uniform, Shader& shader)

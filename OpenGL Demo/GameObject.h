@@ -16,6 +16,8 @@ public:
                std::shared_ptr<Texture> texture = {}, std::shared_ptr<Material> material = {});
 
     void Render(Shader& shader);
+
+    void SetTransform(glm::mat4 transform) { m_transform = transform; }
 private:
     std::shared_ptr<Renderable> m_renderable;
     std::shared_ptr<Texture> m_texture;

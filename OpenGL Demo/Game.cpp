@@ -23,6 +23,19 @@ Game& Game::GetInstance()
     return instance;
 }
 
+std::shared_ptr<GameObject> heli;
+float heliAngle = 0;
+
+glm::mat4 GetHeliTransform()
+{
+    glm::mat4 model = glm::rotate(glm::mat4(1.0f), -heliAngle, glm::vec3 { 0.0f, 1.0f, 0.0f });
+    model = glm::translate(model, glm::vec3 { -8.0f, 2.0f, 0.0f });
+    model = glm::rotate(model, (float) -std::numbers::pi / 9, glm::vec3 { 0.0f, 0.0f, 1.0f });
+    model = glm::rotate(model, (float) -std::numbers::pi / 2, glm::vec3 { 1.0f, 0.0f, 0.0f });
+    model = glm::scale(model, glm::vec3(0.4f));
+    return model;
+}
+
 void Game::Update()
 {
     /*SpotLight& flashLight = *(m_scene->GetSpotLights()[1]);
@@ -30,6 +43,9 @@ void Game::Update()
     const glm::vec3 offset = { 0.0f, -0.3f, 0.0f };
     flashLight.SetPosition(m_camera->GetPosition() - offset);
     flashLight.SetDirection(m_camera->GetOrientation());*/
+
+    heliAngle = fmod(heliAngle + (float) (std::numbers::pi / 1800), 360.0f);
+    heli->SetTransform(GetHeliTransform());
 }
 
 void Game::Run()
@@ -128,7 +144,6 @@ std::shared_ptr<Mesh> CreatePyramid()
         2, 3, 0,
         0, 1, 2
 	};
-    
 
     constexpr size_t VERTEX_COUNT = sizeof(vertices) / sizeof(GLfloat) / STRIDE;
     constexpr GLsizei INDEX_COUNT = sizeof(indices) / sizeof(unsigned int);
@@ -172,33 +187,39 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     glm::vec3 green = { 0.0f, 1.0f, 0.0f };
     glm::vec3 blue  = { 0.0f, 0.0f, 1.0f };
 
-    glm::vec3 lightDirection = { 0.0f, 0.0f, -1.0f };
-    std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(lightDirection, white, 0.3f, 0.6f);
+    glm::vec3 lightDirection = { 0.0f, -15.0f, -10.0f };
+    std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(
+        lightDirection, white, 0.1f, 0.3f,
+        glm::ivec2 { 1024 });
     
     std::unique_ptr<PointLight> greenLight = std::make_unique<PointLight>(
         glm::vec3 { 0.0f, 0.0f, 0.0f },
         glm::vec3 { 0.1f, 0.2f, 0.3f, },
-        blue, 0.0, 0.1f
+        blue, 0.0f, 0.1f,
+        glm::ivec2 { 1024 }
     );
 
     std::unique_ptr<PointLight> blueLight = std::make_unique<PointLight>(
         glm::vec3 { -4.0f, 2.0f, 0.0f },
         glm::vec3 { 0.1f, 0.1f, 0.3f },
-        green, 0.0f, 0.1f
+        green, 0.0f, 0.1f,
+        glm::ivec2 { 1024 }
     );
 
     std::unique_ptr<SpotLight> down = std::make_unique<SpotLight>(
         glm::vec3 { 0.0f, -1.0f, 0.0f }, 20.0f,
         glm::vec3 { 0.0f, 0.0f, 0.0f },
         glm::vec3 { 0.0f, 0.0f, 1.0f },
-        white, 0.0f, 1.0f
+        white, 0.0f, 1.0f,
+        glm::ivec2 { 1024 }
     );
     
     std::unique_ptr<SpotLight> flashLight = std::make_unique<SpotLight>(
         glm::vec3 { -5.0f, -1.0f, 0.0f, }, 20.0f,
         glm::vec3 { 0.0f, 1.5f, 0.0f },
         glm::vec3 { 0.0f, 0.0f, 1.0f },
-        white, 0.0f, 2.0f
+        white, 0.0f, 2.0f,
+        glm::ivec2 { 1024 }
     );
 
     scene->AddDirectionalLight(directionalLight);
@@ -213,11 +234,8 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     std::shared_ptr<GameObject> xwing = std::make_shared<GameObject>(xwingModel, model);
     scene->AddObject(xwing);
 
-    model = glm::translate(glm::mat4(1.0f), glm::vec3 { -3.0f, 2.0f, 0.0f });
-    model = glm::rotate(model, (float) -std::numbers::pi / 2, glm::vec3 { 1.0f, 0.0f, 0.0f });
-    model = glm::scale(model, glm::vec3(0.4f));
     std::shared_ptr<Renderable> heliModel = std::make_shared<Model>("Resources/Models/uh60.obj");
-    std::shared_ptr<GameObject> heli = std::make_shared<GameObject>(heliModel, model);
+    heli = std::make_shared<GameObject>(heliModel, GetHeliTransform());
     scene->AddObject(heli);
 
     return scene;
