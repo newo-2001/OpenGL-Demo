@@ -8,7 +8,7 @@ public:
     SpotLight(glm::vec3 direction, float edge, glm::vec3 position,
               glm::vec3 attenuation, glm::vec3 color,
               float ambientIntensity, float diffuseIntensity,
-              glm::ivec2 shadowDimensions);
+              glm::ivec2 shadowDimensions, float nearPlane, float farPlane);
 
     void Use(const std::string& uniform, Shader& shader);
 

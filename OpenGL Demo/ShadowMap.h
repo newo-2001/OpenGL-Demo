@@ -8,13 +8,15 @@ class ShadowMap
 {
 public:
     ShadowMap(glm::ivec2 shadowDimensions);
-    ~ShadowMap();
+    virtual ~ShadowMap();
 
-    void Write();
-    void Read(GLenum textureUnit);
+    virtual void Write();
+    virtual void Read(GLenum textureUnit);
 
     glm::ivec2 GetDimensions() const { return m_shadowDimensions; }
 protected:
+    ShadowMap();
+
     GLuint m_FBO = 0, m_shadowMap = 0;
     glm::ivec2 m_shadowDimensions;
 };

@@ -31,4 +31,6 @@ private:
     
     Game(int width, int height, const std::string& title);
     void Initialize();
+
+    bool m_flash = false;
 };

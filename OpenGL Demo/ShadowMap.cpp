@@ -3,6 +3,8 @@
 
 #include "GL\glew.h"
 
+ShadowMap::ShadowMap() {}
+
 ShadowMap::ShadowMap(glm::ivec2 shadowDimensions)
     : m_shadowDimensions(shadowDimensions)
 {

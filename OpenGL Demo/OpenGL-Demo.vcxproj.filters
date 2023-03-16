@@ -93,6 +93,9 @@
     <ClCompile Include="ShadowMap.cpp">
       <Filter>Source Files\Rendering\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="OmniDirectionalShadowMap.cpp">
+      <Filter>Source Files\Rendering\Lighting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -155,6 +158,9 @@
     <ClInclude Include="ShadowMap.h">
       <Filter>Header Files\Rendering\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="OmniDirectionalShadowMap.h">
+      <Filter>Header Files\Rendering\Lighting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\fragment.glsl">
@@ -170,6 +176,15 @@
       <Filter>Resource Files\Models</Filter>
     </None>
     <None Include="Resources\Shaders\directional_shadow_map.vertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\omni_directional_shadow_map.fragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\omni_directional_shadow_map.geometry.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\omni_directional_shadow_map.vertex.glsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>

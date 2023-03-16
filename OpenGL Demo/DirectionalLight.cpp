@@ -6,10 +6,12 @@
 DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color,
                                    float ambientIntensity, float diffuseIntensity,
                                    glm::ivec2 shadowDimensions) :
-    LightSource(color, ambientIntensity, diffuseIntensity, shadowDimensions),
+    LightSource(color, ambientIntensity, diffuseIntensity, shadowDimensions,
+                std::make_unique<ShadowMap>(shadowDimensions),
+                glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f)),
+
     m_direction(direction)
 {
-    m_lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
 }
 
 void DirectionalLight::Use(const std::string& uniform, Shader& shader)

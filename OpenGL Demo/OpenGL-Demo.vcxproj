@@ -161,6 +161,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
+    <ClCompile Include="OmniDirectionalShadowMap.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Scene.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Model.h" />
+    <ClInclude Include="OmniDirectionalShadowMap.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Renderable.h" />
@@ -198,6 +200,9 @@
     <None Include="Resources\Models\x-wing.mtl" />
     <None Include="Resources\Shaders\directional_shadow_map.vertex.glsl" />
     <None Include="Resources\Shaders\fragment.glsl" />
+    <None Include="Resources\Shaders\omni_directional_shadow_map.fragment.glsl" />
+    <None Include="Resources\Shaders\omni_directional_shadow_map.geometry.glsl" />
+    <None Include="Resources\Shaders\omni_directional_shadow_map.vertex.glsl" />
     <None Include="Resources\Shaders\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>

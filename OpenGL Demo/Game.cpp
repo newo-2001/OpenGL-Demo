@@ -36,13 +36,18 @@ glm::mat4 GetHeliTransform()
     return model;
 }
 
+SpotLight& GetFlashLight()
+{
+    return *(Game::GetInstance().GetActiveScene().lock()->GetSpotLights()[0]);
+}
+
 void Game::Update()
 {
-    /*SpotLight& flashLight = *(m_scene->GetSpotLights()[1]);
+    SpotLight& flash = GetFlashLight();
 
     const glm::vec3 offset = { 0.0f, -0.3f, 0.0f };
-    flashLight.SetPosition(m_camera->GetPosition() - offset);
-    flashLight.SetDirection(m_camera->GetOrientation());*/
+    flash.SetPosition(m_camera->GetPosition() - offset);
+    flash.SetDirection(m_camera->GetOrientation());
 
     heliAngle = fmod(heliAngle + (float) (std::numbers::pi / 1800), 360.0f);
     heli->SetTransform(GetHeliTransform());
@@ -72,6 +77,14 @@ void Game::Initialize()
 {
     std::shared_ptr<Scene> scene = CreateScene(m_window);
     ChangeScene(scene);
+    
+    Input::OnKeyEvent.Subscribe([this] (Input::KeyEvent event)
+    {
+        if (event.action == GLFW_PRESS && event.key == GLFW_KEY_F)
+        {
+            GetFlashLight().Toggle();
+        }
+    });
 }
 
 void averageNormals(size_t stride, size_t offset,
@@ -189,21 +202,21 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
 
     glm::vec3 lightDirection = { 0.0f, -15.0f, -10.0f };
     std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(
-        lightDirection, white, 0.1f, 0.3f,
+        lightDirection, white, 0.0f, 0.1f,
         glm::ivec2 { 1024 });
     
     std::unique_ptr<PointLight> greenLight = std::make_unique<PointLight>(
-        glm::vec3 { 0.0f, 0.0f, 0.0f },
-        glm::vec3 { 0.1f, 0.2f, 0.3f, },
-        blue, 0.0f, 0.1f,
-        glm::ivec2 { 1024 }
+        glm::vec3 { 1.0f, 2.0f, 0.0f },
+        glm::vec3 { 0.1f, 0.1f, 0.3f, },
+        blue, 0.0f, 1.0f,
+        glm::ivec2 { 1024 }, 0.01f, 100.0f
     );
 
     std::unique_ptr<PointLight> blueLight = std::make_unique<PointLight>(
-        glm::vec3 { -4.0f, 2.0f, 0.0f },
+        glm::vec3 { -4.0f, 3.0f, 0.0f },
         glm::vec3 { 0.1f, 0.1f, 0.3f },
-        green, 0.0f, 0.1f,
-        glm::ivec2 { 1024 }
+        green, 0.0f, 1.0f,
+        glm::ivec2 { 1024 }, 0.01f, 100.0f
     );
 
     std::unique_ptr<SpotLight> down = std::make_unique<SpotLight>(
@@ -211,22 +224,22 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
         glm::vec3 { 0.0f, 0.0f, 0.0f },
         glm::vec3 { 0.0f, 0.0f, 1.0f },
         white, 0.0f, 1.0f,
-        glm::ivec2 { 1024 }
+        glm::ivec2 { 1024 }, 0.01f, 100.0f
     );
     
     std::unique_ptr<SpotLight> flashLight = std::make_unique<SpotLight>(
         glm::vec3 { -5.0f, -1.0f, 0.0f, }, 20.0f,
         glm::vec3 { 0.0f, 1.5f, 0.0f },
         glm::vec3 { 0.0f, 0.0f, 1.0f },
-        white, 0.0f, 2.0f,
-        glm::ivec2 { 1024 }
+        white, 0.0f, 1.0f,
+        glm::ivec2 { 1024 }, 0.01f, 100.0f
     );
 
     scene->AddDirectionalLight(directionalLight);
     scene->AddPointLight(greenLight);
     scene->AddPointLight(blueLight);
-    scene->AddSpotLight(down);
     scene->AddSpotLight(flashLight);
+    //scene->AddSpotLight(down);
     
     model = glm::translate(glm::mat4(1.0f), glm::vec3 { -7.0f, 0.0f, 10.0f });
     model = glm::scale(model, glm::vec3(0.006f));

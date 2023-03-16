@@ -9,7 +9,8 @@ std::string GetActionName(GLenum status);
 std::string ReadFile(const std::string& path);
 void CompileShader(GLuint shader, GLenum shaderType);
 
-Shader::Shader(const std::string& vertexSource, std::optional<const std::string> fragmentSource)
+Shader::Shader(const std::string& vertexSource, std::optional<const std::string> fragmentSource,
+               std::optional<const std::string> geometrySource)
 {
     m_program = glCreateProgram();
     if (!m_program)
@@ -25,13 +26,16 @@ Shader::Shader(const std::string& vertexSource, std::optional<const std::string>
     {
         AttachShader(GL_FRAGMENT_SHADER, fragmentSource.value());
     }
+
+    if (geometrySource.has_value())
+    {
+        AttachShader(GL_GEOMETRY_SHADER, geometrySource.value());
+    }
     
     try
     {
         glLinkProgram(m_program);
-
         VerifyProgramStatus(GL_LINK_STATUS);
-        VerifyProgramStatus(GL_VALIDATE_STATUS);
     }
     catch (...)
     {
@@ -43,6 +47,12 @@ Shader::Shader(const std::string& vertexSource, std::optional<const std::string>
 Shader::~Shader()
 {
     glDeleteProgram(m_program);
+}
+
+void Shader::Validate() const
+{
+    glValidateProgram(m_program);
+    VerifyProgramStatus(GL_VALIDATE_STATUS);
 }
 
 void Shader::Bind() const
@@ -120,12 +130,25 @@ std::unique_ptr<Shader> Shader::FromFile(const std::string& vertexPath)
     return std::make_unique<Shader>(vertexSource, std::nullopt);
 }
 
-std::unique_ptr<Shader> Shader::FromFiles(const std::string& vertexPath, const std::string& fragmentPath)
+std::unique_ptr<Shader> Shader::FromFiles(const std::string& vertexPath,
+                                          const std::string& fragmentPath)
 {
     std::string vertexSource = ReadFile(vertexPath);
     std::string fragmentSource = ReadFile(fragmentPath);
 
     return std::make_unique<Shader>(vertexSource, std::make_optional(fragmentSource));
+}
+
+std::unique_ptr<Shader> Shader::FromFiles(const std::string& vertexPath,
+                                          const std::string& fragmentPath,
+                                          const std::string& geometryPath)
+{
+    std::string vertexSource = ReadFile(vertexPath);
+    std::string fragmentSource = ReadFile(fragmentPath);
+    std::string geometrySource = ReadFile(geometryPath);
+
+    return std::make_unique<Shader>(vertexSource, std::make_optional(fragmentSource),
+                                    std::make_optional(geometrySource));
 }
 
 std::string ReadFile(const std::string& path)

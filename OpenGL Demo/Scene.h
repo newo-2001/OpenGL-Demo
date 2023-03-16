@@ -31,18 +31,19 @@ public:
     void AddPointLight(std::unique_ptr<PointLight>& pointLight);
     void AddSpotLight(std::unique_ptr<SpotLight>& spotLight);
 
-    std::array<std::unique_ptr<SpotLight>, MAX_SPOT_LIGHTS>& GetSpotLights() { return m_spotLights; }
+    std::array<std::shared_ptr<SpotLight>, MAX_SPOT_LIGHTS>& GetSpotLights() { return m_spotLights; }
 private:
     glm::mat4 m_projectionMatrix;
     std::shared_ptr<Shader> m_shader;
 
     std::unique_ptr<Shader> m_directionalShadowShader;
+    std::unique_ptr<Shader> m_omniDirectionalShadowShader;
     std::unique_ptr<DirectionalLight> m_directionalLight;
 
     std::vector<std::shared_ptr<GameObject>> m_objects;
 
-    std::array<std::unique_ptr<PointLight>, Scene::MAX_POINT_LIGHTS> m_pointLights;
-    std::array<std::unique_ptr<SpotLight>, Scene::MAX_SPOT_LIGHTS> m_spotLights;
+    std::array<std::shared_ptr<PointLight>, Scene::MAX_POINT_LIGHTS> m_pointLights;
+    std::array<std::shared_ptr<SpotLight>, Scene::MAX_SPOT_LIGHTS> m_spotLights;
     
     size_t m_pointLightCount = 0;
     size_t m_spotLightCount = 0;
@@ -50,4 +51,5 @@ private:
     void RenderScene(Shader& shader) const;
     void RenderPass() const;
     void DirectionalShadowMapPass(const DirectionalLight& light) const;
+    void OmniDirectionalShadowMapPass(const std::shared_ptr<PointLight>& light) const;
 };
