@@ -2,8 +2,8 @@
 
 #include <string>
 
+#include "stb.h"
 #include <GL\glew.h>
-#include <stb/stb_image.h>
 #include <glm/ext/vector_int2.hpp>
 
 class Texture

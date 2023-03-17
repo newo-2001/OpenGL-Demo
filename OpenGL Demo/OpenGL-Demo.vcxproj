@@ -167,6 +167,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="SkyBox.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -190,7 +191,9 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="SkyBox.h" />
     <ClInclude Include="SpotLight.h" />
+    <ClInclude Include="stb.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Window.h" />
@@ -203,6 +206,8 @@
     <None Include="Resources\Shaders\omni_directional_shadow_map.fragment.glsl" />
     <None Include="Resources\Shaders\omni_directional_shadow_map.geometry.glsl" />
     <None Include="Resources\Shaders\omni_directional_shadow_map.vertex.glsl" />
+    <None Include="Resources\Shaders\skybox.fragment.glsl" />
+    <None Include="Resources\Shaders\skybox.vertex.glsl" />
     <None Include="Resources\Shaders\vertex.glsl" />
   </ItemGroup>
   <ItemGroup>

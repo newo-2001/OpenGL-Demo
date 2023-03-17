@@ -12,6 +12,7 @@
 #include "DirectionalLight.h"
 #include "SpotLight.h"
 #include "GameObject.h"
+#include "SkyBox.h"
 
 class Scene
 {
@@ -40,6 +41,7 @@ private:
     std::unique_ptr<Shader> m_omniDirectionalShadowShader;
     std::unique_ptr<DirectionalLight> m_directionalLight;
 
+    std::shared_ptr<SkyBox> m_skyBox;
     std::vector<std::shared_ptr<GameObject>> m_objects;
 
     std::array<std::shared_ptr<PointLight>, Scene::MAX_POINT_LIGHTS> m_pointLights;

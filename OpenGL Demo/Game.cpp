@@ -195,26 +195,27 @@ std::unique_ptr<Scene> CreateScene(const Window& window)
     std::shared_ptr<GameObject> floorObject = std::make_shared<GameObject>(floor, model, dirtTexture, shinyMaterial);
     scene->AddObject(floorObject);
     
-    glm::vec3 white = { 1.0f, 1.0f, 1.0f };
-    glm::vec3 red   = { 1.0f, 0.0f, 0.0f };
-    glm::vec3 green = { 0.0f, 1.0f, 0.0f };
-    glm::vec3 blue  = { 0.0f, 0.0f, 1.0f };
+    glm::vec3 white  = { 1.0f, 1.0f, 1.0f };
+    glm::vec3 red    = { 1.0f, 0.0f, 0.0f };
+    glm::vec3 green  = { 0.0f, 1.0f, 0.0f };
+    glm::vec3 blue   = { 0.0f, 0.0f, 1.0f };
+    glm::vec3 orange = { 1.0f, 0.53f, 0.3f };
 
-    glm::vec3 lightDirection = { 0.0f, -15.0f, -10.0f };
+    glm::vec3 lightDirection = { -10.0f, -12.0f, 18.5f };
     std::unique_ptr<DirectionalLight> directionalLight = std::make_unique<DirectionalLight>(
-        lightDirection, white, 0.0f, 0.1f,
+        lightDirection, orange, 0.1f, 0.9f,
         glm::ivec2 { 1024 });
     
-    std::unique_ptr<PointLight> greenLight = std::make_unique<PointLight>(
+    std::unique_ptr<PointLight> blueLight = std::make_unique<PointLight>(
         glm::vec3 { 1.0f, 2.0f, 0.0f },
-        glm::vec3 { 0.1f, 0.1f, 0.3f, },
+        glm::vec3 { 0.1f, 0.2f, 0.3f, },
         blue, 0.0f, 1.0f,
         glm::ivec2 { 1024 }, 0.01f, 100.0f
     );
 
-    std::unique_ptr<PointLight> blueLight = std::make_unique<PointLight>(
+    std::unique_ptr<PointLight> greenLight = std::make_unique<PointLight>(
         glm::vec3 { -4.0f, 3.0f, 0.0f },
-        glm::vec3 { 0.1f, 0.1f, 0.3f },
+        glm::vec3 { 0.1f, 0.2f, 0.3f },
         green, 0.0f, 1.0f,
         glm::ivec2 { 1024 }, 0.01f, 100.0f
     );

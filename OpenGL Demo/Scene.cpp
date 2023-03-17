@@ -15,7 +15,15 @@ Scene::Scene(const Window& window) :
         "Resources/Shaders/omni_directional_shadow_map.vertex.glsl",
         "Resources/Shaders/omni_directional_shadow_map.fragment.glsl",
         "Resources/Shaders/omni_directional_shadow_map.geometry.glsl"
-    )))
+    ))),
+    m_skyBox(std::move(std::make_unique<SkyBox>(std::array<std::string, 6> {
+        "Resources/Images/SkyBox/cupertin-lake_rt.tga",
+        "Resources/Images/SkyBox/cupertin-lake_lf.tga",
+        "Resources/Images/SkyBox/cupertin-lake_up.tga",
+        "Resources/Images/SkyBox/cupertin-lake_dn.tga",
+        "Resources/Images/SkyBox/cupertin-lake_bk.tga",
+        "Resources/Images/SkyBox/cupertin-lake_ft.tga"
+    })))
 {
     glm::ivec2 dimensions = window.GetDimensions();
     GLfloat aspectRatio = (GLfloat) dimensions.x / dimensions.y;
@@ -86,7 +94,7 @@ void Scene::OmniDirectionalShadowMapPass(const std::shared_ptr<PointLight>& ligh
     m_omniDirectionalShadowShader->SetUniform(Uniform<float> { "farPlane", light->GetFarPlane() });
 
     std::array<glm::mat4, 6> lightTransforms = light->CalculateLightTransforms();
-    for (int i = 0; i < lightTransforms.size(); i++)
+    for (size_t i = 0; i < lightTransforms.size(); i++)
     {
         std::string name = std::format("lightMatrices[{}]", i);
         m_omniDirectionalShadowShader->SetUniform(Uniform<glm::mat4> { name, lightTransforms[i] });
@@ -110,9 +118,13 @@ void UseOmniDirectionalShadowMap(Shader& shader, PointLight& light, int index)
 
 void Scene::RenderPass() const
 {
+    std::shared_ptr<Camera> camera = Game::GetInstance().GetCamera().lock();
+    glm::mat4 viewMatrix = camera->GetViewMatrix();
+
+    m_skyBox->Render(viewMatrix, m_projectionMatrix);
+
     m_shader->Bind();
     
-    std::shared_ptr<Camera> camera = Game::GetInstance().GetCamera().lock();
     m_directionalLight->Use("directionalLight", *m_shader);
     
     m_shader->SetUniform(Uniform<int> { "pointLightCount", (int) m_pointLightCount });
@@ -134,7 +146,7 @@ void Scene::RenderPass() const
     glm::mat4 lightTransform = m_directionalLight->CalculateLightTransform();
 
     m_shader->SetUniform(Uniform<glm::mat4> { "directionalLightTransform", lightTransform });
-    m_shader->SetUniform(Uniform<glm::mat4> { "view", camera->GetViewMatrix() });
+    m_shader->SetUniform(Uniform<glm::mat4> { "view", viewMatrix });
     m_shader->SetUniform(Uniform<glm::mat4> { "projection", m_projectionMatrix });
     m_shader->SetUniform(Uniform<glm::vec3> { "cameraPos", camera->GetPosition() });
 

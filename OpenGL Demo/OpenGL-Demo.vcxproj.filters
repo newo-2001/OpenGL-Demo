@@ -96,6 +96,9 @@
     <ClCompile Include="OmniDirectionalShadowMap.cpp">
       <Filter>Source Files\Rendering\Lighting</Filter>
     </ClCompile>
+    <ClCompile Include="SkyBox.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -161,6 +164,12 @@
     <ClInclude Include="OmniDirectionalShadowMap.h">
       <Filter>Header Files\Rendering\Lighting</Filter>
     </ClInclude>
+    <ClInclude Include="stb.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBox.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\fragment.glsl">
@@ -185,6 +194,12 @@
       <Filter>Resource Files\Shaders</Filter>
     </None>
     <None Include="Resources\Shaders\omni_directional_shadow_map.vertex.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\skybox.fragment.glsl">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="Resources\Shaders\skybox.vertex.glsl">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
